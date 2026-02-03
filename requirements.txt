@@ -7,7 +7,7 @@ transformers>=4.40.0
 huggingface_hub
 accelerate>=0.29.0
 bitsandbytes>=0.43.1
-numpy
+numpy<2.0.0
 scipy
 networkx
 PyYAML
@@ -16,7 +16,7 @@ safetensors
 tqdm
 regex
 typing_extensions
-baukit
+git+https://github.com/davidbau/baukit.git@main#egg=baukit
 einops
 jaxtyping
 pytest
