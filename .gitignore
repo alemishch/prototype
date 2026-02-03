@@ -92,3 +92,12 @@ docker-data/
 ################################
 coverage.xml
 pytest.xml
+
+__pycache__/
+*.pyc
+.venv/
+.env
+.DS_Store
+# Docker specific
+docker/model_cache/
+src/experiments/results/

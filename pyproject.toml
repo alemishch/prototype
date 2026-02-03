@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "prototype"
+version = "0.1.0"
+description = "prototyping"
+authors = ["alemish"]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = [
+    "tests",
+]
+pythonpath = [
+    "src"
+]
+
+[tool.isort]
+profile = "black"
+
+[tool.black]
+line-length = 88
+target-version = ['py310']
