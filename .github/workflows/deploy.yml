@@ -11,6 +11,28 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # ----------------------------------------------------------------
+      # 1. Python Cache (Speeds up the test step)
+      # ----------------------------------------------------------------
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+            python-version: "3.10"
+            cache: 'pip' # Logic: caches pip downloads
+
+      - name: Install dependencies (For Tests)
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run tests (light)
+        env:
+          SKIP_MODEL_LOAD: "true"
+        run: |
+          pytest -q
+
+      # ----------------------------------------------------------------
+      # 2. Deploy with Docker Layer Caching (Remote)
+      # ----------------------------------------------------------------
       - name: Deploy to server via SSH
         uses: appleboy/ssh-action@v1.2.0
         with:
@@ -23,12 +45,24 @@ jobs:
             cd "${{ secrets.SERVER_PATH }}"
             git fetch --all
             git reset --hard origin/main
+            
+            # Create .env with dynamic port
             cat > .env <<'EOF'
             TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}
             HF_TOKEN=${{ secrets.HF_TOKEN }}
             SKIP_MODEL_LOAD=${{ secrets.SKIP_MODEL_LOAD }}
+            LLM_API_PORT=${{ secrets.LLM_API_PORT }}
             USE_GPU=true
             EOF
+            
+            # Pull previous image to use as cache source
+            echo "🐳 Pulling previous images for caching..."
             docker compose -f docker-compose.gpu.yml pull || true
+            
+            echo "🚀 Building with cache..."
+            # --build ensures we rebuild if code changed
+            # Docker generally uses local layer cache automatically if the image exists
             docker compose -f docker-compose.gpu.yml up -d --build
-            docker compose -f docker-compose.gpu.yml logs --tail=200
+            
+            echo "📜 Logs:"
+            docker compose -f docker-compose.gpu.yml logs --tail=50
