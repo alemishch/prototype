@@ -1,9 +1,8 @@
+version: "3.8"
+
 services:
   llm-api:
-    device_requests:
-      - driver: nvidia
-        count: 1
-        capabilities: [gpu]
+    runtime: nvidia
     build:
       dockerfile: Dockerfile
     command: api
@@ -15,7 +14,8 @@ services:
       - SKIP_MODEL_LOAD=${SKIP_MODEL_LOAD:-false}
       - USE_GPU=true
     ports:
-      - "8000:8000"
+      # Maps HostPort:ContainerPort
+      - "${LLM_API_PORT:-8000}:8000"
     restart: unless-stopped
 
   telegram-bot:
