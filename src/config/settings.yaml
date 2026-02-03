@@ -1,0 +1,15 @@
+model:
+  name: "meta-llama/Meta-Llama-3-8B-Instruct"
+  device: "cuda"
+  load_in_8bit: true
+  cache_dir: "./model_cache"
+
+api:
+  host: "0.0.0.0"
+  port: 8000
+
+bot:
+  allowed_user_ids: [] 
+
+experiment:
+  save_dir: "./experiments/results"
