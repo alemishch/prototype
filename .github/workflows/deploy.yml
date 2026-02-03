@@ -32,4 +32,3 @@ jobs:
             docker compose -f docker-compose.gpu.yml pull || true
             docker compose -f docker-compose.gpu.yml up -d --build
             docker compose -f docker-compose.gpu.yml logs --tail=200
-            
