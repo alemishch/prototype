@@ -10,7 +10,7 @@ services:
       - HF_TOKEN=${HF_TOKEN}
       - SKIP_MODEL_LOAD=${SKIP_MODEL_LOAD:-false}
     ports:
-      - "8000:8000"
+      - "${LLM_API_PORT:-8000}:8000"
     restart: unless-stopped
 
   telegram-bot:
