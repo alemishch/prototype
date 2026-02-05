@@ -27,11 +27,12 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     status_msg = await update.message.reply_text("🧠 Generating...")
     
     try:
-        # Tokenize
-        inputs = _tokenizer(user_text, return_tensors="pt")
+        prompt = f"<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n\n{user_text}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n"
+        
+        inputs = _tokenizer(prompt, return_tensors="pt")
         inputs = {k: v.to(_model.device) for k, v in inputs.items()}
         
-        # Generate
+        
         with torch.no_grad():
             outputs = _model.generate(
                 **inputs,
@@ -40,18 +41,19 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 top_p=0.9,
                 do_sample=True,
                 repetition_penalty=1.05,
-                pad_token_id=_tokenizer.eos_token_id
+                pad_token_id=_tokenizer.eos_token_id,
+                eos_token_id=_tokenizer.eos_token_id
             )
         
-        response = _tokenizer.decode(
-            outputs[0][inputs.shape[-1]:],
-            skip_special_tokens=True
-        )
+        # FIX: Get only the new tokens
+        input_length = inputs['input_ids'].shape[1]
+        response_tokens = outputs[0][input_length:]
+        response = _tokenizer.decode(response_tokens, skip_special_tokens=True)
         
-        if not response:
+        if not response.strip():
             response = "[No response generated]"
         
-        await status_msg.edit_text(response[:4000])  # Telegram limit
+        await status_msg.edit_text(response[:4000])
         
     except Exception as e:
         await status_msg.edit_text(f"❌ Error: {str(e)}")

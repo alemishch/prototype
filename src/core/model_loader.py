@@ -64,12 +64,10 @@ def load_model_and_tokenizer():
         model_kwargs["torch_dtype"] = torch.float32
 
     try:
-        # Try AutoModel first
         model = AutoModelForCausalLM.from_pretrained(
             model_name,
-            torch_dtype=torch.float16,
-            device_map="cuda",
-            attn_implementation="flash_attention_2",
+            **model_kwargs,
+            attn_implementation="flash_attention_2"
         )
     except Exception as e:
         print(f"AutoModelForCausalLM failed, trying LlamaForCausalLM: {e}")
