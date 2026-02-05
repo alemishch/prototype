@@ -53,7 +53,7 @@ def load_model_and_tokenizer():
         model_kwargs["torch_dtype"] = torch.float32
 
     # Load model WITHOUT flash attention
-    model = AutoModelForCausalLM.from_pretrained(model_name, **model_kwargs, attn_implementation="flash_attention_2")
+    model = AutoModelForCausalLM.from_pretrained(model_name, **model_kwargs) #, attn_implementation="flash_attention_2")
     model.eval()
     
     return model, tokenizer
