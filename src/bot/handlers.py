@@ -35,7 +35,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         with torch.no_grad():
             outputs = _model.generate(
                 **inputs,
-                max_new_tokens=256
+                max_new_tokens=256,
                 temperature=0.7,
                 top_p=0.9,
                 do_sample=True,
