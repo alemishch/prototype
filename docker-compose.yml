@@ -1,27 +1,17 @@
 services:
-  llm-api:
-    build:
-      dockerfile: Dockerfile
-    command: api
-    volumes:
-      - ./src:/app/src
-      - ./model_cache:/root/.cache/huggingface
-    environment:
-      - HF_TOKEN=${HF_TOKEN}
-      - SKIP_MODEL_LOAD=${SKIP_MODEL_LOAD:-false}
-    ports:
-      - "${LLM_API_PORT:-8000}:8000"
-    restart: unless-stopped
-
-  telegram-bot:
-    build:
-      dockerfile: Dockerfile
-    command: bot
-    volumes:
-      - ./src:/app/src
+  bot:
+    build: .
+    container_name: llama-telegram-bot
     environment:
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
-      - API_HOST=http://llm-api:8000
-    depends_on:
-      - llm-api
+      - HF_TOKEN=${HF_TOKEN}
+    volumes:
+      - ./model_cache:/root/.cache/huggingface
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
     restart: unless-stopped
