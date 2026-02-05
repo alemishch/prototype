@@ -1,8 +1,8 @@
 model:
   name: "meta-llama/Meta-Llama-3-8B-Instruct"
   device: "cuda"
-  load_in_8bit: true
-  cache_dir: "./model_cache"
+  load_in_8bit: false
+  torch_dtype: "float16"
 
 api:
   host: "0.0.0.0"

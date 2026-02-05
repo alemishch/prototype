@@ -1,7 +1,11 @@
-#### filepath: src/core/model_loader.py
 import os
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import (
+    AutoModelForCausalLM, 
+    AutoTokenizer,
+    LlamaForCausalLM,
+    LlamaTokenizer
+)
 from src.core.utils import load_config
 
 def get_device_and_config():
@@ -24,15 +28,29 @@ def load_model_and_tokenizer():
     
     print(f"Loading {model_name} on {device} (8-bit: {use_8bit})...")
 
-    # Load Tokenizer
-    tokenizer = AutoTokenizer.from_pretrained(model_name, token=hf_token)
+    # Load Tokenizer - try different approaches
+    try:
+        tokenizer = AutoTokenizer.from_pretrained(
+            model_name, 
+            token=hf_token,
+            trust_remote_code=True
+        )
+    except Exception as e:
+        print(f"AutoTokenizer failed, trying LlamaTokenizer: {e}")
+        tokenizer = LlamaTokenizer.from_pretrained(
+            model_name, 
+            token=hf_token,
+            trust_remote_code=True
+        )
+    
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
     # Model Loading Logic
     model_kwargs = {
         "token": hf_token,
-        "trust_remote_code": True
+        "trust_remote_code": True,
+        "low_cpu_mem_usage": True
     }
 
     if device == "cuda":
@@ -42,18 +60,24 @@ def load_model_and_tokenizer():
         else:
             model_kwargs["torch_dtype"] = torch.float16
     else:
-        # Local Development Mock/CPU Fallback
-        # If your local pc cannot handle 8B model, we might want to mock it.
-        # For now, we attempt CPU load (slow, but works for checking code)
         model_kwargs["device_map"] = "cpu"
         model_kwargs["torch_dtype"] = torch.float32
 
     try:
-        model = AutoModelForCausalLM.from_pretrained(model_name, **model_kwargs)
-        # Ensure model is in eval mode
-        model.eval() 
+        # Try AutoModel first
+        model = AutoModelForCausalLM.from_pretrained(
+            model_name,
+            torch_dtype=torch.float16,
+            device_map="cuda",
+            attn_implementation="flash_attention_2",
+        )
     except Exception as e:
-        print(f"❌ Failed to load model: {e}")
-        raise e
+        print(f"AutoModelForCausalLM failed, trying LlamaForCausalLM: {e}")
+        try:
+            model = LlamaForCausalLM.from_pretrained(model_name, **model_kwargs)
+        except Exception as e2:
+            print(f"❌ Both model loaders failed: {e2}")
+            raise e2
 
+    model.eval()
     return model, tokenizer

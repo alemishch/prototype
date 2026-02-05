@@ -35,17 +35,18 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         with torch.no_grad():
             outputs = _model.generate(
                 **inputs,
-                max_new_tokens=150,
+                max_new_tokens=256
                 temperature=0.7,
+                top_p=0.9,
                 do_sample=True,
+                repetition_penalty=1.05,
                 pad_token_id=_tokenizer.eos_token_id
             )
         
-        # Decode
-        generated_text = _tokenizer.decode(outputs[0], skip_special_tokens=True)
-        
-        # Remove the prompt from response
-        response = generated_text[len(user_text):].strip()
+        response = _tokenizer.decode(
+            outputs[0][inputs.shape[-1]:],
+            skip_special_tokens=True
+        )
         
         if not response:
             response = "[No response generated]"
