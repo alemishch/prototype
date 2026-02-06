@@ -1,6 +1,7 @@
 import torch
 from telegram import Update
 from telegram.ext import ContextTypes
+from src.core.utils import load_config
 
 # Global state for model/tokenizer
 _model = None
@@ -19,6 +20,15 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    config = load_config()
+    allowed_ids = config['bot'].get('allowed_user_ids', [])
+
+    # If list is not empty and user is not in it, block them
+    if allowed_ids and user.id not in allowed_ids:
+        await update.message.reply_text(f"⛔ Access Denied. Your ID: {user.id}")
+        return
+    
     if _model is None or _tokenizer is None:
         await update.message.reply_text("❌ Model not loaded!")
         return

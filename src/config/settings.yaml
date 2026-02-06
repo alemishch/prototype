@@ -1,5 +1,5 @@
 model:
-  name: "meta-llama/Meta-Llama-3-8B-Instruct"
+  name: "/app/local_model" 
   device: "cuda"
   load_in_8bit: false
   torch_dtype: "float16"
@@ -9,7 +9,7 @@ api:
   port: 8000
 
 bot:
-  allowed_user_ids: [] 
+  allowed_user_ids: [437643366]
 
 experiment:
   save_dir: "./experiments/results"
