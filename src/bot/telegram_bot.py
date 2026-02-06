@@ -24,7 +24,8 @@ def main():
         set_model_and_tokenizer(model, tokenizer)
         print("✅ Model loaded successfully")
     except Exception as e:
-        print(f"❌ Failed to load model: {e}")
+        # Error is already printed with traceback in load_model_and_tokenizer
+        print("❌ Failed to start bot due to model loading error.")
         return
 
     print("🤖 Starting bot...")
