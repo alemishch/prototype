@@ -1,7 +1,7 @@
 model:
   name: "/app/local_model" 
   device: "cuda"
-  load_in_8bit: false
+  load_in_8bit: true
   torch_dtype: "bfloat16"
 
 api:
