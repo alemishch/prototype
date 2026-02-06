@@ -7,7 +7,7 @@ services:
       - HF_TOKEN=${HF_TOKEN}
     volumes:
       - ./model_cache:/root/.cache/huggingface
-      - ./abliteration/llm-abliteration/ablated_model_v1:/app/local_model
+      - ./abliteration/llm-abliteration/ ablated_llama3_8b_aggressive:/app/local_model
       - ./src:/app/src
     deploy:
       resources:
