@@ -1,5 +1,5 @@
 model:
-  name: "/app/local_model" 
+  name: "QuixiAI/Llama-3-8B-Instruct-abliterated-v2" 
   device: "cuda"
   load_in_8bit: false
   torch_dtype: "bfloat16"
