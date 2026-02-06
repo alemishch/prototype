@@ -1,10 +1,9 @@
 python-telegram-bot==22.6
 python-dotenv==1.2.1
-transformers>=4.41.2
+transformers==4.41.2
 accelerate==0.24.0
-# bitsandbytes==0.41.3
 PyYAML==6.0.3
 safetensors==0.4.0
-huggingface_hub>=0.16.4,<0.17.0
-sentencepiece>=0.1.99
-protobuf>=3.20.0
+huggingface_hub==0.23.0
+sentencepiece==0.2.1
+protobuf==3.20.3
